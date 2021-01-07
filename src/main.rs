@@ -13,7 +13,13 @@ struct Options {
 fn print_text(node: &Node<'_>) {
     match node {
         Node::Text(t) => print!("{}", t),
-        Node::Tag { children, .. } => children.iter().for_each(print_text),
+        Node::Tag { name, children, .. } => {
+            // Ignore xml_body for now - this tag is part of the mechanism that
+            // provides type information on hover.
+            if *name != "xml_body" {
+                children.iter().for_each(print_text);
+            }
+        }
     }
 }
 
