@@ -1,0 +1,15 @@
+[package]
+name = "isabelle-markup"
+version = "0.1.0"
+authors = ["Jakub Kądziołka <kuba@kadziolka.net>"]
+edition = "2018"
+
+[dependencies]
+argh = "0.1.4"
+
+[dependencies.yxml]
+version = "0.1"
+path = "yxml"
+
+[workspace]
+members = ["yxml"]
