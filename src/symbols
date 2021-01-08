@@ -366,8 +366,8 @@
 \<^cancel>              code: 0x002326  group: document  argument: cartouche  font: Isabelle␣DejaVu␣Sans␣Mono
 \<^latex>                               group: document  argument: cartouche
 \<^marker>              code: 0x002710  group: document  argument: cartouche  font: Isabelle␣DejaVu␣Sans␣Mono
-\<open>                 code: 0x002039  group: punctuation  font: Isabelle␣DejaVu␣Sans␣Mono  abbrev: <<
-\<close>                code: 0x00203a  group: punctuation  font: Isabelle␣DejaVu␣Sans␣Mono  abbrev: >>
+\<open>                 code: 0x002039  group: punctuation  font: Isabelle␣DejaVu␣Sans␣Mono  abbrev: <<  abbrev: "
+\<close>                code: 0x00203a  group: punctuation  font: Isabelle␣DejaVu␣Sans␣Mono  abbrev: >>  abbrev: "
 \<^here>                code: 0x002302  font: Isabelle␣DejaVu␣Sans␣Mono
 \<^undefined>           code: 0x002756  font: Isabelle␣DejaVu␣Sans␣Mono
 \<^noindent>            code: 0x0021e4  group: document  font: Isabelle␣DejaVu␣Sans␣Mono
