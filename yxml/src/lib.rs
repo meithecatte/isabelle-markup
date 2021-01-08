@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+/// A node of the parsed YXML tree
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Node<'a> {
     Text(&'a str),
@@ -11,6 +12,7 @@ pub enum Node<'a> {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum ParseError<'a> {
     UnclosedTag(&'a str),
     NoClosingX,
@@ -103,8 +105,91 @@ impl<'a> Node<'a> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    // https://stackoverflow.com/a/27582993
+    macro_rules! map(
+        { $($key:expr => $value:expr),* } => {
+            {
+                #[allow(unused_mut)]
+                let mut m = ::std::collections::HashMap::new();
+                $(
+                    m.insert($key, $value);
+                )*
+                m
+            }
+         };
+    );
+
     #[test]
     fn it_works() {
-        assert_eq!(2 + 2, 4);
+        assert_eq!(
+            parse("\x05\x06tag\x05hi\x05\x06\x05"),
+            Ok(vec![Node::Tag {
+                name: "tag",
+                attrs: map!{},
+                children: vec![Node::Text("hi")]
+            }])
+        );
+    }
+
+    #[test]
+    fn equal_sign_in_attribute() {
+        assert_eq!(
+            parse("\x05\x06tag\x06attr=2+2=4\x05hi\x05\x06\x05"),
+            Ok(vec![Node::Tag {
+                name: "tag",
+                attrs: map!{ "attr" => "2+2=4" },
+                children: vec![Node::Text("hi")]
+            }])
+        );
+    }
+
+    #[test]
+    fn unclosed_tag() {
+        assert_eq!(
+            parse("\x05\x06tag\x05hi"),
+            Err(ParseError::UnclosedTag("tag"))
+        );
+    }
+
+    #[test]
+    fn no_closing_x() {
+        assert_eq!(
+            parse("\x05\x06tag"),
+            Err(ParseError::NoClosingX)
+        );
+    }
+
+    #[test]
+    fn unexpected_content_before_attributes() {
+        assert_eq!(
+            parse("\x05xxx\x06tag\x05hi\x05\x06\x05"),
+            Err(ParseError::UnexpectedContentBeforeAttributes)
+        );
+    }
+
+    #[test]
+    fn missing_name() {
+        assert_eq!(
+            parse("\x05\x05hi\x05\x06\x05"),
+            Err(ParseError::MissingName)
+        );
+    }
+
+    #[test]
+    fn malformed_attribute() {
+        assert_eq!(
+            parse("\x05\x06tag\x06bad_attr\x05hi\x05\x06\x05"),
+            Err(ParseError::MalformedAttribute)
+        );
+    }
+
+    #[test]
+    fn unmatched_closing_tag() {
+        assert_eq!(
+            parse("\x05\x06tag\x05hi\x05\x06\x05\x05\x06\x05"),
+            Err(ParseError::UnmatchedClosingTag)
+        );
     }
 }
