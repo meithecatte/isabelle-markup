@@ -1,31 +1,31 @@
 @font-face {
-  font-family: 'Isabelle DejaVu Sans Mono';
-  src: url('IsabelleDejaVuSansMono.ttf') format('truetype');
+    font-family: 'Isabelle DejaVu Sans Mono';
+    src: url('IsabelleDejaVuSansMono.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: 'Isabelle DejaVu Sans Mono';
-  src: url('IsabelleDejaVuSansMono-Bold.ttf') format('truetype');
-  font-weight: bold;
+    font-family: 'Isabelle DejaVu Sans Mono';
+    src: url('IsabelleDejaVuSansMono-Bold.ttf') format('truetype');
+    font-weight: bold;
 }
 
 @font-face {
-  font-family: 'Isabelle DejaVu Sans Mono';
-  src: url('IsabelleDejaVuSansMono-Oblique.ttf') format('truetype');
-  font-style: italic;
+    font-family: 'Isabelle DejaVu Sans Mono';
+    src: url('IsabelleDejaVuSansMono-Oblique.ttf') format('truetype');
+    font-style: italic;
 }
 
 @font-face {
-  font-family: 'Isabelle DejaVu Sans Mono';
-  src: url('IsabelleDejaVuSansMono-BoldOblique.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
+    font-family: 'Isabelle DejaVu Sans Mono';
+    src: url('IsabelleDejaVuSansMono-BoldOblique.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
 }
 
 .isabelle-code {
-  direction: ltr; unicode-bidi: bidi-override;
-  background-color: #FFFFFF;
-  padding: 10px;
+    direction: ltr; unicode-bidi: bidi-override;
+    background-color: #FFFFFF;
+    padding: 10px;
 }
 
 pre.isabelle-code {
