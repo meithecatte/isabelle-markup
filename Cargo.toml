@@ -2,6 +2,8 @@
 name = "isabelle-markup"
 version = "0.1.0"
 authors = ["Jakub Kądziołka <kuba@kadziolka.net>"]
+# Same license as Isabelle, as it can probably be considered a derivative work
+license = "BSD-3-Clause"
 edition = "2018"
 
 [dependencies]
