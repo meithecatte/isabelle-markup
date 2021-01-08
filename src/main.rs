@@ -4,6 +4,7 @@ use yxml::Node;
 use std::io;
 
 mod output;
+mod symbols;
 
 use output::{Tag, HTMLOutput};
 
@@ -38,7 +39,13 @@ fn write_node(output: &mut HTMLOutput, node: &Node<'_>) -> io::Result<()> {
                     output.open_tag(Tag::SpanClass(classes))?;
                     true
                 }
-                "comment" => {
+                "binding" | "tfree" | "tvar" | "free" | "skolem" | "bound" | "var" |
+                "literal" | "inner_numeral" | "inner_quoted" | "inner_cartouche" |
+                "inner_string" | "antiquoted" |
+                "comment1" | "comment2" | "comment3" | "dynamic_fact" |
+                "quasi_keyword" | "operator" | "string" | "alt_string" | "verbatim" |
+                "cartouche" | "comment" | "improper" | "antiquote" | "raw_text" |
+                "plain_text" => {
                     output.open_tag(Tag::SpanClass(name.to_string()))?;
                     true
                 }
