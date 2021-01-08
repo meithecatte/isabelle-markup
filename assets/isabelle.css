@@ -75,7 +75,7 @@ pre.isabelle-code code::before {
     color: #888;
     border-right: 1px solid #888;
     font-size: 11px;
-    height: 100%;
+    height: 110%;
 }
 
 .control        { font-weight: bold; font-style: italic; }
