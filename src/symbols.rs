@@ -1,10 +1,10 @@
-use regex::Regex;
+use itertools::Itertools;
 use once_cell::sync::Lazy;
+use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::fmt;
 use std::io::{self, prelude::*};
-use itertools::Itertools;
 
 #[derive(Debug)]
 pub struct Symbol {
@@ -24,9 +24,7 @@ impl fmt::Display for Symbol {
     }
 }
 
-static SYMBOL_RE: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"\\<([a-zA-Z_^]+)>").unwrap()
-});
+static SYMBOL_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\<([a-zA-Z_^]+)>").unwrap());
 
 static SYMBOLS: Lazy<HashMap<&'static str, Symbol>> = Lazy::new(parse_symbols);
 
@@ -69,7 +67,9 @@ fn parse_symbols() -> HashMap<&'static str, Symbol> {
             }
         }
 
-        symbols.insert(name, symbol).map(|_| panic!("Multiple symbols with the same name"));
+        symbols
+            .insert(name, symbol)
+            .map(|_| panic!("Multiple symbols with the same name"));
     }
 
     symbols
@@ -80,7 +80,12 @@ pub fn render_symbols(s: &str, mut w: impl Write) -> io::Result<()> {
     for captures in SYMBOL_RE.captures_iter(s) {
         let range = captures.get(0).unwrap().range();
         let symbol = &SYMBOLS[&captures[1]];
-        write!(w, "{}{}", html_escape::encode_text(&s[last_symbol..range.start]), symbol)?;
+        write!(
+            w,
+            "{}{}",
+            html_escape::encode_text(&s[last_symbol..range.start]),
+            symbol
+        )?;
         last_symbol = range.end;
     }
     write!(w, "{}", html_escape::encode_text(&s[last_symbol..]))

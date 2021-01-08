@@ -4,7 +4,7 @@
 //! reopened on the following line, to ensure proper tag nesting.
 
 use std::fs::File;
-use std::io::{self, BufWriter, prelude::*};
+use std::io::{self, prelude::*, BufWriter};
 use std::path::Path;
 
 pub struct HTMLOutput {
@@ -49,7 +49,10 @@ impl HTMLOutput {
     }
 
     pub fn close_tag(&mut self) -> io::Result<()> {
-        self.tag_stack.pop().expect("tag stack underflow").close(&mut self.writer)
+        self.tag_stack
+            .pop()
+            .expect("tag stack underflow")
+            .close(&mut self.writer)
     }
 
     fn write_text_oneline(&mut self, s: &str) -> io::Result<()> {
@@ -86,8 +89,10 @@ impl HTMLOutput {
         write!(self.writer, "<html>")?;
         write!(self.writer, "<head>")?;
         write!(self.writer, r#"<meta charset="utf-8">"#)?;
-        write!(self.writer,
-           r#"<link rel="stylesheet" type="text/css" href="../assets/isabelle.css">"#)?;
+        write!(
+            self.writer,
+            r#"<link rel="stylesheet" type="text/css" href="../assets/isabelle.css">"#
+        )?;
         write!(self.writer, "</head>")?;
         write!(self.writer, "<body>")?;
         write!(self.writer, r#"<pre class="isabelle-code">"#)?;
