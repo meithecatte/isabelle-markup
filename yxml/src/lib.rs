@@ -127,7 +127,7 @@ mod tests {
             parse("\x05\x06tag\x05hi\x05\x06\x05"),
             Ok(vec![Node::Tag {
                 name: "tag",
-                attrs: map!{},
+                attrs: map! {},
                 children: vec![Node::Text("hi")]
             }])
         );
@@ -139,7 +139,7 @@ mod tests {
             parse("\x05\x06tag\x06attr=2+2=4\x05hi\x05\x06\x05"),
             Ok(vec![Node::Tag {
                 name: "tag",
-                attrs: map!{ "attr" => "2+2=4" },
+                attrs: map! { "attr" => "2+2=4" },
                 children: vec![Node::Text("hi")]
             }])
         );
@@ -155,10 +155,7 @@ mod tests {
 
     #[test]
     fn no_closing_x() {
-        assert_eq!(
-            parse("\x05\x06tag"),
-            Err(ParseError::NoClosingX)
-        );
+        assert_eq!(parse("\x05\x06tag"), Err(ParseError::NoClosingX));
     }
 
     #[test]
