@@ -28,6 +28,33 @@
     padding: 10px;
 }
 
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    background: #ffffe9;
+    padding: 5px;
+    margin: 3px;
+    border: 1px solid black;
+    color: black;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.has-tooltip {
+    display: inline-block;
+    z-index: 100;
+    padding: -1px;
+    border: 1px solid transparent;
+}
+
+.has-tooltip:hover {
+    border: 1px solid black;
+}
+
+.has-tooltip:hover > .tooltip {
+    visibility: visible;
+}
+
 pre.isabelle-code {
     counter-reset: linenum;
     display: grid;

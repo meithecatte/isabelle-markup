@@ -13,13 +13,30 @@ pub struct Symbol {
     abbrev: Vec<&'static str>,
 }
 
+impl Symbol {
+    fn tooltip(&self) -> String {
+        let mut tooltip = format!("\\<{}>", self.name);
+        for abbrev in &self.abbrev {
+            tooltip.push_str("\nabbreviation: ");
+            tooltip.push_str(abbrev);
+        }
+        html_escape::encode_text(&tooltip).into_owned()
+    }
+}
+
 impl fmt::Display for Symbol {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let tooltip = format!(r#"<div class="tooltip">{}</div>"#, self.tooltip());
         if let Some(c) = self.unicode {
-            write!(f, "{}", c)
+            write!(f, r#"<span class="has-tooltip">{}{}</span>"#, c, tooltip)
         } else {
             assert!(self.name.starts_with("^"));
-            write!(f, r#"<span class="control">{}</span>"#, &self.name[1..])
+            write!(
+                f,
+                r#"<span class="control has-tooltip">{}{}</span>"#,
+                &self.name[1..],
+                tooltip
+            )
         }
     }
 }
