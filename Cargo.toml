@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 argh = "0.1.4"
+html-escape = "0.2.6"
 
 [dependencies.yxml]
 version = "0.1"
