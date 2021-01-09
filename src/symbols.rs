@@ -28,7 +28,7 @@ impl Symbol {
             if let Some(c) = self.unicode {
                 write!(w, r#"<span class="has-tooltip">{}{}</span>"#, c, tooltip)
             } else {
-                assert!(self.name.starts_with("^"));
+                assert!(self.name.starts_with('^'));
                 write!(
                     w,
                     r#"<span class="control has-tooltip">{}{}</span>"#,
@@ -40,7 +40,7 @@ impl Symbol {
             if let Some(c) = self.unicode {
                 write!(w, "{}", c)
             } else {
-                assert!(self.name.starts_with("^"));
+                assert!(self.name.starts_with('^'));
                 write!(w, r#"<span class="control">{}</span>"#, &self.name[1..])
             }
         }
@@ -52,12 +52,12 @@ static SYMBOL_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\<([a-zA-Z_^]+)>").un
 static SYMBOLS: Lazy<HashMap<&'static str, Symbol>> = Lazy::new(parse_symbols);
 
 fn parse_symbols() -> HashMap<&'static str, Symbol> {
-    static SYMBOL_DATA: &'static str = include_str!("symbols");
+    static SYMBOL_DATA: &str = include_str!("symbols");
 
     let mut symbols = HashMap::new();
 
-    for line in SYMBOL_DATA.split("\n") {
-        if line.is_empty() || line.starts_with("#") {
+    for line in SYMBOL_DATA.split('\n') {
+        if line.is_empty() || line.starts_with('#') {
             continue;
         }
 
@@ -76,7 +76,7 @@ fn parse_symbols() -> HashMap<&'static str, Symbol> {
         for mut args in &parts.chunks(2) {
             let arg: &str = args.next().unwrap();
             let val: &str = args.next().unwrap();
-            assert!(arg.ends_with(":"));
+            assert!(arg.ends_with(':'));
             match arg {
                 "code:" => {
                     assert!(val.starts_with("0x"));

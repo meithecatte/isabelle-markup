@@ -82,7 +82,7 @@ impl<'a> HTMLOutput<'a> {
     }
 
     pub fn write_text(&mut self, s: &str) -> io::Result<()> {
-        let mut lines = s.split("\n");
+        let mut lines = s.split('\n');
         self.write_text_oneline(lines.next().unwrap())?;
         for line in lines {
             self.handle_newline()?;
