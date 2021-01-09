@@ -27,7 +27,9 @@ const Y: char = '\x06';
 
 type ParseResult<'a, T> = Result<(T, &'a str), ParseError<'a>>;
 
-pub fn parse<'input>(mut input: &'input str) -> Result<Vec<Node<'input>>, ParseError<'input>> {
+pub fn parse<'input>(
+    mut input: &'input str,
+) -> Result<Vec<Node<'input>>, ParseError<'input>> {
     let mut nodes = Vec::new();
     while !input.is_empty() {
         let (node, rest) = Node::from_str(input)?;
@@ -78,7 +80,8 @@ impl<'a> Node<'a> {
                     let name = attributes.next().ok_or(ParseError::MissingName)?;
                     let attrs = attributes
                         .map(|attr| {
-                            let offset = attr.find('=').ok_or(ParseError::MalformedAttribute)?;
+                            let offset =
+                                attr.find('=').ok_or(ParseError::MalformedAttribute)?;
                             Ok((&attr[0..offset], &attr[offset + 1..]))
                         })
                         .collect::<Result<_, _>>()?;

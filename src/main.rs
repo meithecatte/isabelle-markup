@@ -43,12 +43,12 @@ fn write_node(output: &mut HTMLOutput<'_>, node: &Node<'_>) -> io::Result<()> {
                     output.open_tag(Tag::SpanClass(classes))?;
                     true
                 }
-                "binding" | "tfree" | "tvar" | "free" | "skolem" | "bound" | "var" | "literal"
-                | "inner_numeral" | "inner_quoted" | "inner_cartouche" | "inner_string"
-                | "antiquoted" | "comment1" | "comment2" | "comment3" | "dynamic_fact"
-                | "quasi_keyword" | "operator" | "string" | "alt_string" | "verbatim"
-                | "cartouche" | "comment" | "improper" | "antiquote" | "raw_text"
-                | "plain_text" => {
+                "binding" | "tfree" | "tvar" | "free" | "skolem" | "bound" | "var"
+                | "literal" | "inner_numeral" | "inner_quoted" | "inner_cartouche"
+                | "inner_string" | "antiquoted" | "comment1" | "comment2"
+                | "comment3" | "dynamic_fact" | "quasi_keyword" | "operator"
+                | "string" | "alt_string" | "verbatim" | "cartouche" | "comment"
+                | "improper" | "antiquote" | "raw_text" | "plain_text" => {
                     output.open_tag(Tag::SpanClass(name.to_string()))?;
                     true
                 }

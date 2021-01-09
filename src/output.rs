@@ -114,7 +114,9 @@ impl<'a> HTMLOutput<'a> {
 
     fn write_text_oneline(&mut self, s: &str) -> io::Result<()> {
         match &self.tooltip {
-            TooltipState::None => crate::symbols::render_symbols(s, &mut self.writer, true),
+            TooltipState::None => {
+                crate::symbols::render_symbols(s, &mut self.writer, true)
+            }
             TooltipState::Pending(tooltip) => {
                 write!(self.writer, r#"<span class="has-tooltip">"#)?;
                 crate::symbols::render_symbols(s, &mut self.writer, false)?;
