@@ -55,8 +55,28 @@ fn write_node(output: &mut HTMLOutput<'_>, node: &Node<'_>) -> io::Result<()> {
                 _ => false,
             };
 
+            let tooltip = match *name {
+                "citation" => Some("citation"),
+                "token_range" => Some("inner syntax token"),
+                "free" => Some("free variable"),
+                "skolem" => Some("skolem variable"),
+                "bound" => Some("bound variable"),
+                "var" => Some("schematic variable"),
+                "tfree" => Some("free type variable"),
+                "tvar" => Some("schematic type variable"),
+                _ => None,
+            };
+
+            if let Some(s) = tooltip {
+                output.tooltip_html(s);
+            }
+
             for child in children {
                 write_node(output, child)?;
+            }
+
+            if tooltip.is_some() {
+                output.tooltip_end();
             }
 
             if close_tag {

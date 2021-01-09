@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufWriter};
 use std::path::Path;
 
+#[derive(Debug, PartialEq, Eq)]
 enum TooltipState {
     None,
     Pending(String),
@@ -16,7 +17,9 @@ enum TooltipState {
 pub struct HTMLOutput<'a> {
     writer: Box<dyn Write + 'a>,
     tag_stack: Vec<Tag>,
+    /// Drives the tooltip state machine.
     tooltip: TooltipState,
+    tooltip_depth: usize,
     /// If `true`, this is the topmost instance of `HTMLOutput` (as opposed to the contents
     /// of a tooltip). This variable determines whether lines should be split across `<code>`
     /// tags, as well as whether the epilogue should be written out on drop.
@@ -48,6 +51,7 @@ impl<'a> HTMLOutput<'a> {
             writer: Box::new(BufWriter::new(File::create(path)?)),
             tag_stack: vec![],
             tooltip: TooltipState::None,
+            tooltip_depth: 0,
             root: true,
         };
 
@@ -60,6 +64,7 @@ impl<'a> HTMLOutput<'a> {
             writer: Box::new(io::Cursor::new(buf)),
             tag_stack: vec![],
             tooltip: TooltipState::None,
+            tooltip_depth: 0,
             root: false,
         }
     }
@@ -77,8 +82,54 @@ impl<'a> HTMLOutput<'a> {
             .close(&mut self.writer)
     }
 
+    pub fn tooltip_html(&mut self, s: &str) {
+        self.tooltip_depth += 1;
+
+        match self.tooltip {
+            TooltipState::None => {
+                self.tooltip = TooltipState::Pending(s.to_string());
+            }
+            TooltipState::Pending(ref mut buf) => {
+                buf.push('\n');
+                buf.push_str(s);
+            }
+            TooltipState::Emitted => {
+                panic!("Nested tooltip parents");
+            }
+        }
+    }
+
+    pub fn tooltip_end(&mut self) {
+        assert_eq!(self.tooltip, TooltipState::Emitted);
+        if self.tooltip_depth == 0 {
+            panic!("Tooltip depth underflow");
+        }
+
+        self.tooltip_depth -= 1;
+
+        if self.tooltip_depth == 0 {
+            self.tooltip = TooltipState::None;
+        }
+    }
+
     fn write_text_oneline(&mut self, s: &str) -> io::Result<()> {
-        crate::symbols::render_symbols(s, &mut self.writer, true)
+        match &self.tooltip {
+            TooltipState::None => crate::symbols::render_symbols(s, &mut self.writer, true),
+            TooltipState::Pending(tooltip) => {
+                write!(self.writer, r#"<span class="has-tooltip">"#)?;
+                crate::symbols::render_symbols(s, &mut self.writer, false)?;
+                write!(
+                    self.writer,
+                    r#"<div class="tooltip">{}</div></span>"#,
+                    tooltip
+                )?;
+                self.tooltip = TooltipState::Emitted;
+                Ok(())
+            }
+            TooltipState::Emitted => {
+                panic!("Tooltip parent extended after shipout")
+            }
+        }
     }
 
     pub fn write_text(&mut self, s: &str) -> io::Result<()> {
@@ -93,6 +144,10 @@ impl<'a> HTMLOutput<'a> {
     }
 
     fn handle_newline(&mut self) -> io::Result<()> {
+        if self.tooltip != TooltipState::None {
+            panic!("Newline inside of tooltip parent");
+        }
+
         if self.root {
             for tag in self.tag_stack.iter().rev() {
                 tag.close(&mut self.writer)?;
