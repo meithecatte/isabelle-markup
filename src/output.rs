@@ -120,7 +120,7 @@ impl<'a> HTMLOutput<'a> {
                 crate::symbols::render_symbols(s, &mut self.writer, false)?;
                 write!(
                     self.writer,
-                    r#"<div class="tooltip">{}</div></span>"#,
+                    r#"<span class="tooltip">{}</span></span>"#,
                     tooltip
                 )?;
                 self.tooltip = TooltipState::Emitted;

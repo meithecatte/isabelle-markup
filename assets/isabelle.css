@@ -29,6 +29,7 @@
 }
 
 .tooltip {
+    display: block;
     visibility: hidden;
     position: absolute;
     background: #ffffe9;

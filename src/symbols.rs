@@ -24,7 +24,7 @@ impl Symbol {
 
     fn write(&self, mut w: impl Write, with_tooltips: bool) -> io::Result<()> {
         if with_tooltips {
-            let tooltip = format!(r#"<div class="tooltip">{}</div>"#, self.tooltip());
+            let tooltip = format!(r#"<span class="tooltip">{}</span>"#, self.tooltip());
             if let Some(c) = self.unicode {
                 write!(w, r#"<span class="has-tooltip">{}{}</span>"#, c, tooltip)
             } else {
