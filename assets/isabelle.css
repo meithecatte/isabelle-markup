@@ -51,6 +51,8 @@
 
 .has-tooltip:hover .tooltip {
     visibility: visible;
+    transition-property: visibility;
+    transition-delay: 0.5s;
 }
 
 pre.isabelle-code {
