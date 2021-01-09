@@ -153,7 +153,7 @@ impl<'a> HTMLOutput<'a> {
                 tag.close(&mut self.writer)?;
             }
 
-            write!(self.writer, "</code>\n<code>")?;
+            write!(self.writer, "</code><code>")?;
 
             for tag in self.tag_stack.iter() {
                 tag.open(&mut self.writer)?;
