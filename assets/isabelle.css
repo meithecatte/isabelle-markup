@@ -42,16 +42,13 @@
 
 .has-tooltip {
     display: inline-block;
-    z-index: 100;
-    padding: -1px;
-    border: 1px solid transparent;
 }
 
 .has-tooltip:hover {
-    border: 1px solid black;
+    background: #ddd;
 }
 
-.has-tooltip:hover > .tooltip {
+.has-tooltip:hover .tooltip {
     visibility: visible;
 }
 
