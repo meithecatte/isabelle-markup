@@ -20,7 +20,7 @@ struct Options {
     out_path: PathBuf,
 }
 
-fn write_node(output: &mut HTMLOutput, node: &Node<'_>) -> io::Result<()> {
+fn write_node(output: &mut HTMLOutput<'_>, node: &Node<'_>) -> io::Result<()> {
     match node {
         Node::Text(t) => {
             output.write_text(t)?;

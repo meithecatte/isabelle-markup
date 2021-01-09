@@ -7,9 +7,20 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufWriter};
 use std::path::Path;
 
-pub struct HTMLOutput {
-    writer: BufWriter<File>,
+enum TooltipState {
+    None,
+    Pending(String),
+    Emitted,
+}
+
+pub struct HTMLOutput<'a> {
+    writer: Box<dyn Write + 'a>,
     tag_stack: Vec<Tag>,
+    tooltip: TooltipState,
+    /// If `true`, this is the topmost instance of `HTMLOutput` (as opposed to the contents
+    /// of a tooltip). This variable determines whether lines should be split across `<code>`
+    /// tags, as well as whether the epilogue should be written out on drop.
+    root: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -31,15 +42,26 @@ impl Tag {
     }
 }
 
-impl HTMLOutput {
-    pub fn to_file(path: &Path) -> io::Result<Self> {
+impl<'a> HTMLOutput<'a> {
+    pub fn to_file(path: &Path) -> io::Result<HTMLOutput<'static>> {
         let mut writer = HTMLOutput {
-            writer: BufWriter::new(File::create(path)?),
+            writer: Box::new(BufWriter::new(File::create(path)?)),
             tag_stack: vec![],
+            tooltip: TooltipState::None,
+            root: true,
         };
 
         writer.write_preamble()?;
         Ok(writer)
+    }
+
+    pub fn into_buffer<'buf>(buf: &'buf mut Vec<u8>) -> HTMLOutput<'buf> {
+        HTMLOutput {
+            writer: Box::new(io::Cursor::new(buf)),
+            tag_stack: vec![],
+            tooltip: TooltipState::None,
+            root: false,
+        }
     }
 
     pub fn open_tag(&mut self, tag: Tag) -> io::Result<()> {
@@ -71,14 +93,18 @@ impl HTMLOutput {
     }
 
     fn handle_newline(&mut self) -> io::Result<()> {
-        for tag in self.tag_stack.iter().rev() {
-            tag.close(&mut self.writer)?;
-        }
+        if self.root {
+            for tag in self.tag_stack.iter().rev() {
+                tag.close(&mut self.writer)?;
+            }
 
-        write!(self.writer, "</code>\n<code>")?;
+            write!(self.writer, "</code>\n<code>")?;
 
-        for tag in self.tag_stack.iter() {
-            tag.open(&mut self.writer)?;
+            for tag in self.tag_stack.iter() {
+                tag.open(&mut self.writer)?;
+            }
+        } else {
+            write!(self.writer, "\n")?;
         }
 
         Ok(())
@@ -101,8 +127,10 @@ impl HTMLOutput {
     }
 }
 
-impl Drop for HTMLOutput {
+impl<'a> Drop for HTMLOutput<'a> {
     fn drop(&mut self) {
-        write!(self.writer, "</code></pre></body></html>").unwrap();
+        if self.root {
+            write!(self.writer, "</code></pre></body></html>").unwrap();
+        }
     }
 }
