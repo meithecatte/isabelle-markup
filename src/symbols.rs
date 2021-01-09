@@ -3,7 +3,6 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryInto;
-use std::fmt;
 use std::io::{self, prelude::*};
 
 #[derive(Debug)]
@@ -22,21 +21,28 @@ impl Symbol {
         }
         html_escape::encode_text(&tooltip).into_owned()
     }
-}
 
-impl fmt::Display for Symbol {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let tooltip = format!(r#"<div class="tooltip">{}</div>"#, self.tooltip());
-        if let Some(c) = self.unicode {
-            write!(f, r#"<span class="has-tooltip">{}{}</span>"#, c, tooltip)
+    fn write(&self, mut w: impl Write, with_tooltips: bool) -> io::Result<()> {
+        if with_tooltips {
+            let tooltip = format!(r#"<div class="tooltip">{}</div>"#, self.tooltip());
+            if let Some(c) = self.unicode {
+                write!(w, r#"<span class="has-tooltip">{}{}</span>"#, c, tooltip)
+            } else {
+                assert!(self.name.starts_with("^"));
+                write!(
+                    w,
+                    r#"<span class="control has-tooltip">{}{}</span>"#,
+                    &self.name[1..],
+                    tooltip
+                )
+            }
         } else {
-            assert!(self.name.starts_with("^"));
-            write!(
-                f,
-                r#"<span class="control has-tooltip">{}{}</span>"#,
-                &self.name[1..],
-                tooltip
-            )
+            if let Some(c) = self.unicode {
+                write!(w, "{}", c)
+            } else {
+                assert!(self.name.starts_with("^"));
+                write!(w, r#"<span class="control">{}</span>"#, &self.name[1..])
+            }
         }
     }
 }
@@ -92,17 +98,17 @@ fn parse_symbols() -> HashMap<&'static str, Symbol> {
     symbols
 }
 
-pub fn render_symbols(s: &str, mut w: impl Write) -> io::Result<()> {
+pub fn render_symbols(s: &str, mut w: impl Write, with_tooltips: bool) -> io::Result<()> {
     let mut last_symbol = 0;
     for captures in SYMBOL_RE.captures_iter(s) {
         let range = captures.get(0).unwrap().range();
         let symbol = &SYMBOLS[&captures[1]];
         write!(
             w,
-            "{}{}",
+            "{}",
             html_escape::encode_text(&s[last_symbol..range.start]),
-            symbol
         )?;
+        symbol.write(&mut w, with_tooltips)?;
         last_symbol = range.end;
     }
     write!(w, "{}", html_escape::encode_text(&s[last_symbol..]))

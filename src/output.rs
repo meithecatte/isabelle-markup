@@ -56,7 +56,7 @@ impl HTMLOutput {
     }
 
     fn write_text_oneline(&mut self, s: &str) -> io::Result<()> {
-        crate::symbols::render_symbols(s, &mut self.writer)
+        crate::symbols::render_symbols(s, &mut self.writer, true)
     }
 
     pub fn write_text(&mut self, s: &str) -> io::Result<()> {
