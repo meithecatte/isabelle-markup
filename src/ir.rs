@@ -76,13 +76,16 @@ pub fn trim_empty(tree: &mut Vec<TagTree<'_>>) {
 /// Returns true if subtree contains tooltips after merging.
 pub fn merge_tooltips<'a>(
     tree: &mut Vec<TagTree<'a>>,
-    mut parent_tooltip: Option<&mut String>,
+    parent_tooltip: Option<&mut String>,
 ) -> bool {
     if let Some(parent_tooltip) = parent_tooltip {
         // The parent tooltip is only relevant when this is the only child
         if tree.len() == 1 {
             match &mut tree[0] {
-                TagTree::Tag { tag, ref mut children } => {
+                TagTree::Tag {
+                    tag,
+                    ref mut children,
+                } => {
                     match tag {
                         Tag::SpanClass(_) => {
                             return merge_tooltips(children, Some(parent_tooltip));
@@ -91,7 +94,7 @@ pub fn merge_tooltips<'a>(
                             parent_tooltip.push('\n');
                             parent_tooltip.push_str(&s);
                             // Obtain ownership of the children
-                            if let TagTree::Tag { children, ..  } = tree.pop().unwrap() {
+                            if let TagTree::Tag { children, .. } = tree.pop().unwrap() {
                                 *tree = children;
                                 return merge_tooltips(tree, Some(parent_tooltip));
                             } else {

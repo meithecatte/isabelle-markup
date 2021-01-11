@@ -39,6 +39,9 @@
     color: black;
     font-weight: normal;
     font-style: normal;
+
+    transition-property: visibility;
+    transition-delay: 0.5s;
 }
 
 .has-tooltip {
@@ -49,7 +52,7 @@
     background: #ddd;
 }
 
-.has-tooltip:hover .tooltip {
+.has-tooltip:hover > .tooltip {
     visibility: visible;
     transition-property: visibility;
     transition-delay: 0.5s;

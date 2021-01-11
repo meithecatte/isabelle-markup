@@ -21,6 +21,20 @@ struct Options {
     out_path: PathBuf,
 }
 
+fn processed_ir<'a>(input: &[Node<'a>]) -> Vec<TagTree<'a>> {
+    let mut ir: Vec<TagTree> = input.iter().flat_map(lower_node).collect();
+    trim_empty(&mut ir);
+    merge_tooltips(&mut ir, None);
+    ir
+}
+
+fn render_to_string(input: &[Node<'_>]) -> String {
+    let ir = processed_ir(input);
+    let mut buf = Vec::new();
+    write_nodes(&mut io::Cursor::new(&mut buf), &ir, false).unwrap();
+    String::from_utf8(buf).unwrap()
+}
+
 fn lower_node<'input>(node: &Node<'input>) -> Vec<TagTree<'input>> {
     match node {
         Node::Text(s) => vec![TagTree::Text(s)],
@@ -53,14 +67,35 @@ fn lower_node<'input>(node: &Node<'input>) -> Vec<TagTree<'input>> {
             };
 
             let tooltip = match *name {
-                "citation" => Some("citation"),
-                "token_range" => Some("inner syntax token"),
-                "free" => Some("free variable"),
-                "skolem" => Some("skolem variable"),
-                "bound" => Some("bound variable"),
-                "var" => Some("schematic variable"),
-                "tfree" => Some("free type variable"),
-                "tvar" => Some("schematic type variable"),
+                "citation" => Some("citation".to_owned()),
+                "token_range" => Some("inner syntax token".to_owned()),
+                "free" => Some("free variable".to_owned()),
+                "skolem" => Some("skolem variable".to_owned()),
+                "bound" => Some("bound variable".to_owned()),
+                "var" => Some("schematic variable".to_owned()),
+                "tfree" => Some("free type variable".to_owned()),
+                "tvar" => Some("schematic type variable".to_owned()),
+                "xml_elem" => {
+                    let prefix = match attrs["xml_name"] {
+                        "ML_typing" => "ML: ",
+                        "typing" | "sorting" => ":: ",
+                        "class_parameter" => "",
+                        name => unimplemented!("{}", name),
+                    };
+
+                    let body = children
+                        .iter()
+                        .find_map(|child| match child {
+                            Node::Tag {
+                                name: "xml_body",
+                                children,
+                                ..
+                            } => Some(children),
+                            _ => None,
+                        })
+                        .unwrap();
+                    Some(format!("{}{}", prefix, render_to_string(body)))
+                }
                 _ => None,
             };
 
@@ -92,10 +127,7 @@ fn main() -> io::Result<()> {
     let options: Options = argh::from_env();
     let yxml = std::fs::read_to_string(&options.dump_path)?;
     let nodes = yxml::parse(&yxml).unwrap();
-
-    let mut ir: Vec<TagTree> = nodes.iter().flat_map(lower_node).collect();
-    trim_empty(&mut ir);
-    merge_tooltips(&mut ir, None);
+    let ir = processed_ir(&nodes);
     let lines = split_lines(&ir);
 
     let mut writer = BufWriter::new(File::create(&options.out_path)?);
