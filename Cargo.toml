@@ -17,5 +17,9 @@ itertools = "0.10.0"
 version = "0.1"
 path = "yxml"
 
+[dependencies.vec_mut_scan]
+git = "https://github.com/NieDzejkob/vec_mut_scan"
+branch = "main"
+
 [workspace]
 members = ["yxml"]

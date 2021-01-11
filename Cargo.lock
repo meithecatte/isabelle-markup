@@ -71,6 +71,7 @@ dependencies = [
  "itertools",
  "once_cell",
  "regex",
+ "vec_mut_scan",
  "yxml",
 ]
 
@@ -174,6 +175,11 @@ name = "utf8-width"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9071ac216321a4470a69fb2b28cfc68dcd1a39acd877c8be8e014df6772d8efa"
+
+[[package]]
+name = "vec_mut_scan"
+version = "0.3.0"
+source = "git+https://github.com/NieDzejkob/vec_mut_scan?branch=main#719e4691ed585fa82a93cadd476d419e9d973729"
 
 [[package]]
 name = "yxml"
